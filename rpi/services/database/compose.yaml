@@ -1,0 +1,14 @@
+services:
+  hl_postgres:
+    container_name: hl_postgres
+    image: postgres:15.4-alpine
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-homelab-metrics}
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    tty: true
+    ports:
+      - "5432:5432"
