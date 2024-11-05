@@ -1,0 +1,43 @@
+services:
+  hl.postgres:
+    container_name: postgres
+    image: postgres:15.4-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - /homelab/volumes/postgres-data:/var/lib/postgresql/data
+    tty: true
+    ports:
+      - "5432:5432"
+    networks:
+      - homelab_network
+
+  hl.nanomq:
+    image: emqx/nanomq:0.22
+    container_name: nanomq
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    networks:
+      - homelab_network
+
+  hl.metrics:
+    image: horekih/homelab:metrics-service-latest
+    container_name: metrics-service
+    restart: unless-stopped
+    environment:
+      - HL_POSTGRES_DSN=${HL_POSTGRES_DSN}
+      - HL_DEBUG=${HL_DEBUG}
+      - HL_LOG_LEVEL=${HL_LOG_LEVEL}
+    ports:
+      - "9999:9999"
+    tty: true
+    networks:
+      - homelab_network
+
+networks:
+  homelab_network:
+    driver: bridge

@@ -51,7 +51,7 @@ class HyperLoguruLogger:
 
         logger = cls.customize_logging(
             logging_config.get("path"),
-            level=logging_config.get("level", settings.LOG_LEVEL),
+            level=settings.LOG_LEVEL or logging_config.get("level", "INFO"),
             retention=logging_config.get("retention"),
             rotation=logging_config.get("rotation"),
             format=logging_config.get("format"),
