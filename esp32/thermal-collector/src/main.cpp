@@ -8,9 +8,12 @@ Config config;
 
 void setup() {
     config = app_config_builder.Build();
+
     Serial.begin(config.baudrate);
-    wifi_service.ConnectToWifi(config.wifi_ssid, config.wifi_password);
+    wifi_service.MakeInitialConfigurationWifiAP();
 }
 
+
 void loop(){
+    wifi_service.WaitForConfigurationAndConnect();
 }
