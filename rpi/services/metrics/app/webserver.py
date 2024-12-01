@@ -1,4 +1,4 @@
-from app.core.logging import hyperlogger
+from app.core.logging import LoggerMixin, setup_logging
 from app.core.settings import get_settings
 from fastapi import FastAPI
 from app.api.routes import api_router
@@ -14,11 +14,11 @@ def create_app() -> FastAPI:
         debug=settings.DEBUG,
         version=settings.VERSION,
     )
-    app.logger = hyperlogger
+    setup_logging(loglevel=settings.log_level_int)
 
     app.include_router(api_router)
     # exception handlers
-    setup_exception_handlers(app)
+    app = setup_exception_handlers(app)
 
     return app
 

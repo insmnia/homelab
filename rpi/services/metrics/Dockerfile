@@ -5,8 +5,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 COPY pyproject.toml poetry.lock* /
-COPY ./app /app
-COPY ./fastapi_logging.json /app/fastapi_logging.json
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --no-cache-dir poetry && \
@@ -16,11 +14,14 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # ------------------------------------------------------------
 FROM python:3.12-slim AS production
 
+RUN apt update && apt upgrade -y && apt install network-manager -y
+
 COPY --from=builder /opt/venv /opt/venv
-COPY --from=builder /app /app
-COPY --from=builder /app/fastapi_logging.json /app/fastapi_logging.json
+COPY ./alembic.ini /alembic.ini
+COPY ./alembic /alembic
+COPY ./app /app
 
 EXPOSE 9999
+ENV PYTHONPATH=/
 # ------------------------------------------------------------
-ENV HL_LOGGING_CONFIG_PATH=/app/fastapi_logging.json
-CMD ["/opt/venv/bin/python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "9999", "--reload"]
+CMD ["/opt/venv/bin/python", "-m", "uvicorn", "app.webserver:app", "--host", "0.0.0.0", "--port", "9999", "--reload"]
