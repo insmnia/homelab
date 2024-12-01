@@ -9,5 +9,4 @@ def get_self_ip() -> str:
     return ips[0]
 
 
-# SELF_IP = get_self_ip()
-SELF_IP = "127.0.0.1"
+SELF_IP = get_self_ip()
