@@ -8,13 +8,11 @@ settings = get_settings()
 class NotFound(Exception):
     entity: str
 
-    def __init__(self, *_, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, *_: list, **kwargs: dict[str, Any]) -> None:
         if settings.DEBUG:
             for k, v in kwargs.items():
                 kwargs[k] = str(v)
-            super().__init__(
-                f"{self.entity} is not found with given attributes: {kwargs}"
-            )
+            super().__init__(f"{self.entity} is not found with given attributes: {kwargs}")
         else:
             super().__init__(f"{self.entity} is not found")
 
@@ -22,12 +20,10 @@ class NotFound(Exception):
 class AlreadyExists(Exception):
     entity: str
 
-    def __init__(self, *_, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, *_: list, **kwargs: dict[str, Any]) -> None:
         if settings.DEBUG:
             for k, v in kwargs.items():
                 kwargs[k] = str(v)
-            super().__init__(
-                f"{self.entity} already exists with given attributes: {kwargs}"
-            )
+            super().__init__(f"Such {self.entity} already exists with given attributes: {kwargs}")
         else:
-            super().__init__(f"{self.entity} is not found")
+            super().__init__(f"Such {self.entity} already exists")

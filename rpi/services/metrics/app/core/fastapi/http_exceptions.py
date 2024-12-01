@@ -5,9 +5,10 @@ from starlette.status import (
     HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_409_CONFLICT,
 )
-from loguru import logger
+from app.core.base_errors import AlreadyExists, NotFound
+from app.core.logging import get_logger
 
-from app.core.errors.base import AlreadyExists, NotFound
+logger = get_logger("FastAPI")
 
 
 async def any_exception_handler(_: Request, exc: Exception) -> JSONResponse:

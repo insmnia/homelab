@@ -16,10 +16,12 @@ pydantic-settings = "^2.6.1"
 python-dotenv = "^1.0.1"
 sqlalchemy = "^2.0.36"
 uvicorn = "^0.32.0"
-loguru = "^0.7.2"
 
 greenlet = "^3.1.1"
 taskiq = "^0.11.7"
+wifi = "^0.3.8"
+httpx = "^0.28.0"
+structlog = "^24.4.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -37,3 +39,76 @@ name = "cz_conventional_commits"
 version = "0.0.0"
 tag_format = "v$version"
 version_files = ["pyproject.toml:^version"]
+
+[tool.ruff]
+line-length = 127
+extend-exclude = ["alembic"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "E402",
+    "SLF001",
+    "S101",
+    "ANN201",
+    "DTZ001",
+    "ARG001",
+    "FA100",
+    "PGH004",
+    "EXE002",
+    "C901",
+    "RET504",
+    "FA102",
+    "PLR0913",
+    "PT006",
+    "PLR0913",
+    "PT011",
+    "PT012",
+    "D104",
+    "TRY003",
+    "FBT001",
+    "S324",
+    "EM101",
+    "D102",
+    "ARG002",
+    "RUF013",
+    "B904",
+    "BLE001",
+    "Q000",
+    "PTH123",
+    "FBT002",
+    "I001",
+    "PERF401",
+    "S311",
+    "PYI024",
+    "N805",
+    "S105",
+    "B008",
+    "ANN001",
+    "DTZ006",
+    "RUF017",
+    "TRY300",
+    "TRY002",
+    "N818",
+    "C417",
+    "PLW2901",
+    "PLR1704",
+    "FBT003",
+    "RUF100",
+    "RUF015",
+    "EM102",
+    "D105",
+    "ANN204",
+    "D213",
+    "RUF012",
+    "PTH118",
+    "FLY002",
+    "RET503",
+    "COM812",
+    "D",
+    "TRY401",
+    "G004",
+]
