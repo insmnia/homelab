@@ -1,0 +1,10 @@
+# Ignore the Terraform local state files
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Ignore other Terraform artifacts
+*.tfvars
+
+# Ignore any local environment configurations
+*.tfplan
