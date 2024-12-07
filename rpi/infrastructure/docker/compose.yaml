@@ -1,5 +1,7 @@
 services:
   hl.postgres:
+    profiles:
+      - "runtime"
     container_name: postgres
     image: postgres:15.4-alpine
     restart: always
@@ -17,23 +19,58 @@ services:
 
   hl.nanomq:
     image: emqx/nanomq:0.22
+    profiles:
+      - "runtime"
     container_name: nanomq
-    restart: unless-stopped
+    restart: always
     ports:
       - "1883:1883"
     networks:
       - homelab_network
 
   hl.metrics:
-    image: horekih/homelab:metrics-service-latest
+    image: europe-central2-docker.pkg.dev/homelab-443907/homelab-dev-registry/metrics-service:${TAG:-latest}
+    profiles:
+      - "runtime"
     container_name: metrics-service
-    restart: unless-stopped
+    restart: always
+    env_file:
+      - .env
     environment:
       - HL_POSTGRES_DSN=${HL_POSTGRES_DSN}
       - HL_DEBUG=${HL_DEBUG}
       - HL_LOG_LEVEL=${HL_LOG_LEVEL}
     ports:
       - "9999:9999"
+    tty: true
+    networks:
+      - homelab_network
+
+  hl.metrics.scheduler:
+    image: europe-central2-docker.pkg.dev/homelab-443907/homelab-dev-registry/metrics-service:${TAG:-latest}
+    profiles:
+      - "runtime"
+    command: "/opt/venv/bin/python /app/scheduler.py"
+    container_name: metrics-scheduler
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - /var/run/dbus:/var/run/dbus
+    privileged: true
+    network_mode: host
+    tty: true
+
+  hl.metrics.migration:
+    image: europe-central2-docker.pkg.dev/homelab-443907/homelab-dev-registry/metrics-service:${TAG:-latest}
+    profiles:
+      - "infrastructure"
+    command: "/opt/venv/bin/python -m alembic upgrade head"
+    container_name: metrics-service-migration
+    env_file:
+      - .env
+    environment:
+      - HL_POSTGRES_DSN=${HL_POSTGRES_DSN}
     tty: true
     networks:
       - homelab_network
