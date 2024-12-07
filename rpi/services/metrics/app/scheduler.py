@@ -42,7 +42,7 @@ if __name__ == "__main__":
     asyncio.run(
         run_taskiq_scheduler(
             SchedulerArgs(
-                scheduler="app.background:scheduler",
+                scheduler="app.scheduler:scheduler",
                 modules=["app.tasks"],
                 tasks_pattern=("**/*task.py",),
                 fs_discover=True,
