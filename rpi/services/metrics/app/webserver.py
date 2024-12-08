@@ -1,4 +1,4 @@
-from app.core.logging import LoggerMixin, setup_logging
+from app.core.logging import setup_logging
 from app.core.settings import get_settings
 from fastapi import FastAPI
 from app.api.routes import api_router

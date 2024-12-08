@@ -3,7 +3,6 @@ from typing import TypedDict
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from app.core.base_sql_repository import UniqueKeyDuplicateError
-from app.domains.device.errors import DeviceAlreadyExistsError
 from app.domains.device.repository import DeviceFilter, DeviceSQLRepository
 
 

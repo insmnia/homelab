@@ -46,7 +46,7 @@ class DeviceDiscoveryTask(LoggerMixin):
             settings.DEVICE_CONFIGURATION.wifi_ssid_header_name: settings.DEVICE_CONFIGURATION.host_wifi_ssid,
             settings.DEVICE_CONFIGURATION.wifi_pwd_header_name: settings.DEVICE_CONFIGURATION.host_wifi_pwd,
             settings.DEVICE_CONFIGURATION.api_key_header_name: "lkfjsdklfj",
-            settings.DEVICE_CONFIGURATION.register_url_header_name: f"{settings.SCHEME}://{SELF_IP}:{settings.PORT}/devices",
+            settings.DEVICE_CONFIGURATION.register_url_header_name: f"{settings.SCHEME}://{SELF_IP}:{settings.PORT}/{settings.DEVICE_CONFIGURATION.api_registration_resource}",
         }
         async with httpx.AsyncClient() as client:
             try:

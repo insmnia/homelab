@@ -1,6 +1,6 @@
 from functools import cached_property, lru_cache
 import logging
-from typing import Literal
+from typing import Final, Literal
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
@@ -23,6 +23,8 @@ class DeviceConfigurationSettings(BaseModel):
     wifi_pwd_header_name: str = "XXX-HL-WIFI-PWD"
     api_key_header_name: str = "XXX-HL-API-KEY"
     register_url_header_name: str = "XXX-HL-REGISTER-URL"
+
+    api_registration_resource: Final[str] = "api/devices"
 
     @cached_property
     def device_config_endpoint(self) -> str:
