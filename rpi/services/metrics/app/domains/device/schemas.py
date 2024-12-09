@@ -11,8 +11,9 @@ class DeviceCreatePayload(BaseModel):
     name: Annotated[str | None, Field(max_length=50)]
     description: Annotated[str | None, Field(max_length=255)] = None
 
-class DeviceResponsePayload(BaseSchemaModel, DeviceCreatePayload):
-    ...
+
+class DeviceResponsePayload(BaseSchemaModel, DeviceCreatePayload): ...
+
 
 class DeviceRegisterResponsePayload(DeviceResponsePayload):
     broker_ip: str

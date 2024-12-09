@@ -29,10 +29,20 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.2"
 pytest-asyncio = "^0.23.2"
+aiosqlite = "^0.20.0"
+factory-boy = "^3.3.1"
+async-factory-boy = "^1.0.1"
 
+pytest-httpx = "^0.35.0"
 [tool.poetry.group.dev.dependencies]
 commitizen = "^3.27.0"
 ruff = "^0.6.4"
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"
+consider_namespace_packages = "True"
+log_level = "INFO"
+pythonpath = "."
 
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -111,4 +121,5 @@ ignore = [
     "D",
     "TRY401",
     "G004",
+    "W292",
 ]

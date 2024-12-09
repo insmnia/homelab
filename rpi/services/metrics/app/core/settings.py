@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 from pydantic_settings.main import SettingsConfigDict
 
-from app.core.network_utils import SELF_IP
+from app.core.network_utils import get_self_ip
 
 
 class DeviceConfigurationSettings(BaseModel):
@@ -30,10 +30,15 @@ class DeviceConfigurationSettings(BaseModel):
     def device_config_endpoint(self) -> str:
         return f"http://{self.device_http_server_ip}:{self.device_http_server_port}/{self.device_configuration_resource}"
 
+
 class MessageBrokerSettings(BaseModel):
-    host: str = SELF_IP
     port: int = 1883
     metrics_topic_name: str = "metrics"
+
+    @cached_property
+    def host(self) -> str:
+        return get_self_ip()
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -46,7 +51,7 @@ class Settings(BaseSettings):
     VERSION: str = "0.0.0"
     DEBUG: bool = False
     PORT: int = 9999
-    SCHEME: Literal['http', 'https'] = "http"
+    SCHEME: Literal["http", "https"] = "http"
     LOG_LEVEL: Literal["INFO", "DEBUG", "WARNING", "CRITICAL"] = "INFO"
 
     POSTGRES_DSN: str = ""

@@ -23,12 +23,14 @@ settings = get_settings()
 class UniqueKeyDuplicateError(Exception): ...
 
 
-def _raise_db_error_from_exc(exc: Exception) -> None:
+async def _raise_db_error_from_exc(exc: Exception, session: Optional[AsyncSession] = None) -> None:
     exc_str = str(exc)
+    if session is not None:
+        await session.rollback()
 
     match type(exc):
         case IntegrityError:  # noqa
-            if "unique constraint" in exc_str:
+            if "unique constraint" in exc_str.lower():
                 raise UniqueKeyDuplicateError(exc_str) from exc
 
     raise exc
@@ -57,7 +59,7 @@ class BaseSQLRepository(Generic[T, F]):
                 session.add(instance)
                 await session.flush()
         except Exception as exc:
-            _raise_db_error_from_exc(exc)
+            await _raise_db_error_from_exc(exc, session=session)
         return instance
 
     async def update(self, id_: DatabaseEntityId, data: M, session: Optional[AsyncSession] = None) -> None:
@@ -73,7 +75,7 @@ class BaseSQLRepository(Generic[T, F]):
                 await session.execute(q)
                 await session.flush()
         except Exception as exc:
-            _raise_db_error_from_exc(exc)
+            await _raise_db_error_from_exc(exc, session=session)
 
     async def get(self, id_: DatabaseEntityId, db_filter: Optional[F] = None) -> T | None:
         async with session_factory() as session:
@@ -96,6 +98,7 @@ class BaseSQLRepository(Generic[T, F]):
         db_filter: Optional[F] = None,
         page_size: int = settings.BASE_PAGE_SIZE,
         page: int = 1,
+        session: Optional[AsyncSession] = None,
     ) -> list[T]:
         async with session_factory() as session:
             q = sa.select(self.Table)

@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import text
 from app.core.logging import get_logger
 from app.core.settings import get_settings
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 
 settings = get_settings()
