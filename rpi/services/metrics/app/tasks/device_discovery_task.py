@@ -1,16 +1,16 @@
 from app.core.logging import LoggerMixin
-from app.core.network_utils import SELF_IP
+from app.core.network_utils import get_self_ip
 from app.scheduler import broker
 import asyncio
 import subprocess
 import httpx
-from app.core.settings import get_settings
-
-settings = get_settings()
-
+from app.core.settings import Settings, get_settings
 
 
 class DeviceDiscoveryTask(LoggerMixin):
+    def __init__(self, settings: Settings | None = None) -> None:
+        self._settings = settings or get_settings()
+
     async def _get_new_device_wifi_ssid(self) -> str | None:
         proc = await asyncio.create_subprocess_shell(
             "nmcli --fields SSID dev wifi",
@@ -24,7 +24,7 @@ class DeviceDiscoveryTask(LoggerMixin):
 
         ssids = stdout.decode().split("\n")[1:]  # amend SSID header
         for ssid in ssids:
-            if settings.DEVICE_CONFIGURATION.device_wifi_ap_pattern in ssid:
+            if self._settings.DEVICE_CONFIGURATION.device_wifi_ap_pattern in ssid:
                 return ssid
 
     async def _connect_to_ssid(self, ssid: str, pwd: str) -> None:
@@ -43,17 +43,17 @@ class DeviceDiscoveryTask(LoggerMixin):
 
     async def _send_wifi_configuration(self) -> None:
         headers = {
-            settings.DEVICE_CONFIGURATION.wifi_ssid_header_name: settings.DEVICE_CONFIGURATION.host_wifi_ssid,
-            settings.DEVICE_CONFIGURATION.wifi_pwd_header_name: settings.DEVICE_CONFIGURATION.host_wifi_pwd,
-            settings.DEVICE_CONFIGURATION.api_key_header_name: "lkfjsdklfj",
-            settings.DEVICE_CONFIGURATION.register_url_header_name: f"{settings.SCHEME}://{SELF_IP}:{settings.PORT}/{settings.DEVICE_CONFIGURATION.api_registration_resource}",
+            self._settings.DEVICE_CONFIGURATION.wifi_ssid_header_name: self._settings.DEVICE_CONFIGURATION.host_wifi_ssid,
+            self._settings.DEVICE_CONFIGURATION.wifi_pwd_header_name: self._settings.DEVICE_CONFIGURATION.host_wifi_pwd,
+            self._settings.DEVICE_CONFIGURATION.api_key_header_name: "lkfjsdklfj",
+            self._settings.DEVICE_CONFIGURATION.register_url_header_name: f"{self._settings.SCHEME}://{get_self_ip()}:{self._settings.PORT}/{self._settings.DEVICE_CONFIGURATION.api_registration_resource}",
         }
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(
-                    settings.DEVICE_CONFIGURATION.device_config_endpoint,
+                    self._settings.DEVICE_CONFIGURATION.device_config_endpoint,
                     headers=headers,
-                    timeout=settings.DEVICE_CONFIGURATION.device_response_timeout_sec,
+                    timeout=self._settings.DEVICE_CONFIGURATION.device_response_timeout_sec,
                 )
                 self.logger.info(f"Got response from device: [{response.status_code}]{response.text}")
             except httpx.ReadTimeout:
@@ -70,11 +70,11 @@ class DeviceDiscoveryTask(LoggerMixin):
             self.logger.info("Didn't find any devices on wifi network")
             return
 
-        await self._connect_to_ssid(new_device_wifi_ssid, settings.DEVICE_CONFIGURATION.device_wifi_pwd)
+        await self._connect_to_ssid(new_device_wifi_ssid, self._settings.DEVICE_CONFIGURATION.device_wifi_pwd)
         await self._send_wifi_configuration()
         await self._connect_to_ssid(  # connect back to host WiFi
-            settings.DEVICE_CONFIGURATION.host_wifi_ssid,
-            settings.DEVICE_CONFIGURATION.host_wifi_pwd,
+            self._settings.DEVICE_CONFIGURATION.host_wifi_ssid,
+            self._settings.DEVICE_CONFIGURATION.host_wifi_pwd,
         )
 
 

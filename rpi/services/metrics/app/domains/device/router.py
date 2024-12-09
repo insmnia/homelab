@@ -19,17 +19,19 @@ settings = get_settings()
                 "Device response. If device is already registered, the device obj is returned. "
                 "This is done to prevent multiple HTTP requests from device side and do "
                 "registration as-fast-as-possible"
-            )
+            ),
         }
-    }
+    },
 )
-async def register_device(device_service: DeviceServiceDependency, payload: DeviceCreatePayload) -> Device.RetrieveData:
+async def register_device(
+    device_service: DeviceServiceDependency, payload: DeviceCreatePayload
+) -> DeviceRegisterResponsePayload:
     device = await device_service.create(Device.CreateData(**payload.model_dump(mode="json")))
-    return DeviceRegisterResponsePayload(
+    return DeviceRegisterResponsePayload.model_construct(
         **device,
         broker_ip=settings.BROKER_CONFIGURATION.host,
         broker_port=settings.BROKER_CONFIGURATION.port,
-        metrics_topic_name=f"{settings.BROKER_CONFIGURATION.metrics_topic_name}/{device['id']}"
+        metrics_topic_name=f"{settings.BROKER_CONFIGURATION.metrics_topic_name}/{device['id']}",
     )
 
 

@@ -20,10 +20,10 @@ from app.core.logging import LoggerMixin
 class BrokerMiddleware(TaskiqMiddleware, LoggerMixin):
     def on_error(
         self,
-        message: "TaskiqMessage",
-        result: "TaskiqResult[Any]",
+        message: TaskiqMessage,
+        result: TaskiqResult[Any],
         exception: BaseException,
-    ) -> "Union[None, Coroutine[Any, Any, None]]":
+    ) -> Union[None, Coroutine[Any, Any, None]]:
         tb_str = "".join(traceback.format_exception(type(exception), value=exception, tb=exception.__traceback__))
         self.logger.error(tb_str)
         return None

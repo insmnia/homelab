@@ -37,7 +37,7 @@ class DeviceService:
             db_model = await self._device_sql_repo.create(data=input_data, session=self._sql_db_session)
         except UniqueKeyDuplicateError:
             # device already exists, need to send broker settings anyway for device to start operating
-            db_model = await self._device_sql_repo.list(DeviceFilter(name=input_data['name']), page_size=1)
+            db_model = await self._device_sql_repo.list(DeviceFilter(name=input_data["name"]), page_size=1)
             db_model = db_model[0]
 
         return Device.RetrieveData(**db_model.__dict__)

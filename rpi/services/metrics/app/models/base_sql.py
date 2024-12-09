@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm.base import Mapped
 from app.core import DatabaseEntityId
 from app.core.databases.postgres import Base
-from sqlalchemy import BigInteger, DateTime
+from sqlalchemy import BigInteger, DateTime, Integer
 
 
 def datetime_default_factory() -> datetime:
@@ -15,7 +15,7 @@ class BaseSQLModel(Base):
     __abstract__ = True
 
     id: Mapped[DatabaseEntityId] = mapped_column(
-        BigInteger,
+        BigInteger().with_variant(Integer, "sqlite"),
         primary_key=True,
         autoincrement=True,
         nullable=False,
