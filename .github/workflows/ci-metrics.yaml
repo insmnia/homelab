@@ -2,39 +2,41 @@ name: Metrics Service CI
 
 on:
   push:
-    branches: ['**']  # This will match any branch, for every commit
+    branches: ["**"] # This will match any branch, for every commit
+    paths:
+      - rpi/services/metrics/**
 
 jobs:
-  build-and-test:
+  lint-and-test:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: rpi/services/metrics
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
 
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python -
-        echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python -
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
 
-    - name: Install dependencies
-      run: poetry install
+      - name: Install dependencies
+        run: poetry install
 
-    - name: Run Ruff lint checks
-      run: poetry run ruff check .
+      - name: Run Ruff lint checks
+        run: poetry run ruff check .
 
-    - name: Run Ruff format checks
-      run: poetry run ruff format --check .
+      - name: Run Ruff format checks
+        run: poetry run ruff format --check .
 
-    - name: Run tests with pytest
-      run: poetry run pytest
-      env:
-        HL_POSTGRES_DSN: ${{ secrets.CI_POSTGRES_DSN }}
+      - name: Run tests with pytest
+        run: poetry run pytest
+        env:
+          HL_POSTGRES_DSN: ${{ secrets.CI_POSTGRES_DSN }}
