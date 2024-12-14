@@ -2,13 +2,16 @@
 #include "HTTPClient.h"
 #include "WiFi.h"
 #include "Types.h"
+#include "PubSubClient.h"
 
 WiFiClient wifi_client;
 HTTPClient http_client;
+PubSubClient pbClient(wifi_client);
+
 char payloadBuffer[2048];
+char mqttMessageBuffer[255];
 int retries = 1;
 const int MAX_RETRIES = 10;
-const MessagingConfig emptyConfig = MessagingConfig{"", 0, "", -1};
 
 Result<String> extractIntOrStringValue(const String &jsonString, const String &key)
 {
@@ -104,4 +107,37 @@ Result<MessagingConfig> MetricsHTTPClient::GetMessagingConfig(String deviceRegis
         *topic.value,
         deviceId.value->toInt()};
     return Result<MessagingConfig>(new MessagingConfig(config));
+}
+
+void MetricsMQTTClient::SendMeasurements(String topicName, float temperature, float humidity)
+{
+    memset(mqttMessageBuffer, 0, sizeof(mqttMessageBuffer)); // clear buffer
+    snprintf(
+        mqttMessageBuffer,
+        sizeof(mqttMessageBuffer),
+        "{\"temperature\": %f, \"humidity\": %f}",
+        temperature, humidity);
+    pbClient.publish(topicName.c_str(), mqttMessageBuffer);
+}
+
+void MetricsMQTTClient::Begin(String brokerHost, int brokerPort, int deviceId)
+{
+    pbClient.setServer(brokerHost.c_str(), brokerPort);
+    String clientName = String("Thermal collector #") + String(deviceId);
+
+    while (!pbClient.connected())
+    {
+        Serial.print("Attempting MQTT connection... ");
+        if (pbClient.connect(clientName.c_str()))
+        {
+            Serial.println("Connected!");
+        }
+        else
+        {
+            Serial.print("Failed, rc=");
+            Serial.print(pbClient.state());
+            Serial.println(" try again in 5 seconds");
+            delay(5000);
+        }
+    }
 }

@@ -1,0 +1,7 @@
+services:
+  nanomq:
+    image: emqx/nanomq:0.22
+    container_name: nanomq
+    restart: always
+    ports:
+      - "1883:1883"

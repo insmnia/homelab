@@ -29,6 +29,9 @@ public:
 
 class MetricsMQTTClient
 {
+public:
+    void SendMeasurements(String topicName, float temperature, float humidity);
+    void Begin(String brokerHost, int brokerPort, int deviceId);
 };
 
 #endif
